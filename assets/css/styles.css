@@ -121,6 +121,13 @@ body {
   border: none;
 }
 
+@media (prefers-color-scheme: dark) {
+  .navbar-item.navbar-selected {
+    color: #4c4c4c;
+  }
+}
+
+
 .navbar-item.navbar-selected:active {
   margin-bottom: -10px;
 }
