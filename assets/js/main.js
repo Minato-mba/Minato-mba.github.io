@@ -74,7 +74,14 @@ function addPosts(posts) {
 
         const coverDiv = document.createElement("div");
         coverDiv.className = "cover";
-        coverDiv.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0),rgba(0, 0, 0, 0),rgb(58, 58, 58)), url(${post.coverImage})`;
+
+        const coverBg = document.createElement("div");
+        coverBg.className = "cover-bg";
+        coverBg.style.backgroundImage = `url(${post.coverImage})`;
+        const coverGradient = document.createElement("div");
+        coverGradient.className = "cover-gradient";
+        coverDiv.appendChild(coverBg);
+        coverDiv.appendChild(coverGradient);
 
         const titleElement = document.createElement("h2");
         titleElement.className = "title";
