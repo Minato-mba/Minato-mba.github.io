@@ -235,3 +235,7 @@
     font-size: 1.2rem;
     padding-top: 0.5rem;
   }
+
+  .cooldown-message{
+    opacity: 0.5;
+  }
