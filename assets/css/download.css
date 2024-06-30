@@ -236,6 +236,6 @@
     padding-top: 0.5rem;
   }
 
-  .cooldown-message{
+  #cooldown-message{
     opacity: 0.5;
   }
