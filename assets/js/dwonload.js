@@ -159,5 +159,6 @@ function toggleChecked() {
 function playSound(sound) {
   sound.pause()
   sound.currentTime = 0
+  sound.volume = 0.4
   sound.play();
 }
