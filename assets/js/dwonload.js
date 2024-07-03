@@ -14,9 +14,9 @@ document.addEventListener("DOMContentLoaded", function () {
       .then(response => response.json())
       .then(data => populatePage(data))
       .catch(error => {
-        const container = document.getElementById('download-container');
+        const container = document.getElementById('content-container');
         container.innerHTML = `
-          <div id="download-header"><h1>Error 404 - Data not found</h1>
+          <div id="container-header"><h1>Error 404 - Data not found</h1>
           </div><div style="text-align: left; padding: 10px; line-height: 1.8;">
             Content ID: <span style="font-weight: bold; color: #ad7878">${contentId}</span>.<br>Content not found in downloads.json.<br>This Error usually happens when the link is modified.<br>Please check the link and try again.
           </div>`;
@@ -30,43 +30,68 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function populatePage(pageData) {
-      const downloadButtonsContainer = document.getElementById('download-buttons');
-      if(pageData["generated-code"]){
+    const downloadButtonsContainer = document.getElementById('download-buttons');
+    if(pageData["generated-code"]){
         const codeDiv = document.getElementById("generated-code");
         document.getElementById("toggle-container").checked = false;
         const key = generateKey();
         codeDiv.setAttribute("value", key);
         document.getElementById("generated-code-container").removeAttribute("hidden");
-      }
+    }
 
-      const title = document.getElementById('download-header');
-      title.innerHTML = `<h1>${pageData.title}</h1>`
+    const title = document.getElementById('container-header');
+    title.innerHTML = `<h1>${pageData.title}</h1>`
 
-      // Generate buttons
-      pageData.buttons.forEach(button => {
-          const btn = document.createElement('button');
-          btn.innerText = button.text;
-          btn.className = button.color + ' general-button';
-          btn.dataset.href = button.link;
-          btn.addEventListener('click', () => {
+    // Generate buttons
+    pageData.buttons.forEach((button, index) => {
+        const btn = document.createElement('button');
+        btn.innerText = button.text;
+        btn.className = button.color + ' general-button';
+        btn.dataset.href = button.link;
+        btn.addEventListener('click', () => {
             const sound = document.getElementById("clickSound")
             playSound(sound)
             setTimeout(() => {
-              const baseHref = btn.getAttribute("data-href");
-              if (!baseHref) return;
-              if (document.getElementById("disable-toggle").checked && coolDown === 0) {
-                document.location.href = baseHref;
-              } else {
-                if (baseHref.match(new RegExp("^https?://")) === null) return;
-                const baseUrl = `https://link-to.net/908484/${Math.random() * 1000}/dynamic/`;
-                const href = `${baseUrl}?r=${btoa(encodeURI(baseHref))}`;
-                document.location.href = href;
-              }
+                const baseHref = btn.getAttribute("data-href");
+                if (!baseHref) return;
+                if (document.getElementById("disable-toggle").checked && coolDown === 0) {
+                    document.location.href = baseHref;
+                } else {
+                    if (baseHref.match(new RegExp("^https?://")) === null) return;
+                    const baseUrl = `https://link-to.net/908484/${Math.random() * 1000}/dynamic/`;
+                    const href = `${baseUrl}?r=${btoa(encodeURI(baseHref))}`;
+                    document.location.href = href;
+                }
             },sound.duration * 1000); 
-          });
-          downloadButtonsContainer.appendChild(btn);
-      });
-  }
+        });
+        downloadButtonsContainer.appendChild(btn);
+
+        // Hide buttons beyond the 4th
+        if (index >= 4 && pageData.buttons[4]) {
+            btn.style.display = 'none';
+        }
+    });
+
+    // Add "Others" button if there are more than 5 buttons
+    if (pageData.buttons.length > 5) {
+        const othersBtn = document.createElement('button');
+        othersBtn.innerText = '▼ Others';
+        othersBtn.className = 'general-button gray-button';
+        othersBtn.addEventListener('click', () => {
+            const sound = document.getElementById("clickSound")
+            playSound(sound)
+            const hiddenButtons = Array.from(downloadButtonsContainer.children).slice(4);
+            hiddenButtons.forEach(button => {
+                button.style.display = button.style.display === 'none' ? 'flex' : 'none';
+            });
+            othersBtn.innerText = othersBtn.innerText === 'Others' ? 'Hide Others' : 'Others';
+        });
+        downloadButtonsContainer.appendChild(othersBtn);
+    }
+}
+
+
+
 });
 
 const chars = {a0: "G",a1: "V",a2: "C",a3: "D",a4: "E",a5: "F",a6: "K",a7: "X",a8: "S",a9: "L",aa: "W",ab: "T",ac: "M",ad: "Z",ae: "R",af: "P",};

@@ -8,7 +8,7 @@
   
   
   
-  #download-container {
+  #content-container {
     background-color: #484a4b;
     border: 0.2rem solid #131313;
     border-radius: 0.2rem;
@@ -19,28 +19,28 @@
     box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.2);
   }
   
-  #download-header {
+  #container-header {
     background-color: #484a4b;
     border-bottom: 0.2rem solid #393b3c;
     padding: 1rem;
   }
   
-  #download-header h1 {
+  #container-header h1 {
     margin: 0;
     font-size: 2rem;
   }
   
-  .download-content {
+  .content {
     padding: 1.5rem;
     border-top: 0.2rem solid #5e6061;
   }
   
-  .download-content p {
+  .content p {
     font-size: 1.5rem;
     margin: 1rem 0;
   }
   
-  .download-content h2 {
+  .content h2 {
     font-size: 1.5rem;
     text-align: left;
   }
@@ -212,7 +212,7 @@
     font-size: 0.8rem;
   }
   
-  #download-container h3 {
+  #content-container h3 {
     font-size: 1rem;
   }
   
