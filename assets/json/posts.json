@@ -33,10 +33,46 @@
   ],
   "others": [
     {
-      "title": "ModBay Feed Discord App",
-      "description": "This Bot allows you to receive notifications from ModBay when a creator you are subscribed to submits a new mod or a new update. you can also subscribe to comment section of any creator.",
-      "link": "#",
-      "coverImage": "assets/images/modBay.png"
+      "title": "Discord-bot-offline-notifier",
+      "description": "",
+      "link": "https://github.com/MinecraftBedrockArabic/Discord-bot-offline-notifier",
+      "coverImage": "https://opengraph.githubassets.com/hash137623/MinecraftBedrockArabic/Discord-bot-offline-notifier"
+    },
+    {
+      "title": "Minecraft-Bedrock-Player-heads",
+      "description": "Discord bot that add player heads to a pack",
+      "link": "https://github.com/MinecraftBedrockArabic/Minecraft-Bedrock-Player-heads",
+      "coverImage": "https://opengraph.githubassets.com/hash730537/MinecraftBedrockArabic/Minecraft-Bedrock-Player-heads"
+    },
+    {
+      "title": "MinecraftBedrockArabic",
+      "description": "",
+      "link": "https://github.com/MinecraftBedrockArabic/MinecraftBedrockArabic",
+      "coverImage": "https://opengraph.githubassets.com/hash696011/MinecraftBedrockArabic/MinecraftBedrockArabic"
+    },
+    {
+      "title": "minecraftbedrockarabic.github.io",
+      "description": "",
+      "link": "https://github.com/MinecraftBedrockArabic/minecraftbedrockarabic.github.io",
+      "coverImage": "https://opengraph.githubassets.com/hash399187/MinecraftBedrockArabic/minecraftbedrockarabic.github.io"
+    },
+    {
+      "title": "Modbay-Feed-Discord-bot",
+      "description": "",
+      "link": "https://github.com/MinecraftBedrockArabic/Modbay-Feed-Discord-bot",
+      "coverImage": "https://opengraph.githubassets.com/hash249755/MinecraftBedrockArabic/Modbay-Feed-Discord-bot"
+    },
+    {
+      "title": "random",
+      "description": "random scripts i coded",
+      "link": "https://github.com/MinecraftBedrockArabic/random",
+      "coverImage": "https://opengraph.githubassets.com/hash219419/MinecraftBedrockArabic/random"
+    },
+    {
+      "title": "testingWebsite",
+      "description": "",
+      "link": "https://github.com/MinecraftBedrockArabic/testingWebsite",
+      "coverImage": "https://opengraph.githubassets.com/hash24740/MinecraftBedrockArabic/testingWebsite"
     }
   ],
   "friends": [
