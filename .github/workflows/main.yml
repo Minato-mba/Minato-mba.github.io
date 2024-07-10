@@ -1,4 +1,4 @@
-name: Update beta api
+name: Update Posts
 
 on:
   push:
