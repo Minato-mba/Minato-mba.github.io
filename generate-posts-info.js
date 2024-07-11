@@ -126,7 +126,7 @@ fetch(apiUrl)
       title: repo.name,
       description: repo.description??"",
       link: repo.html_url,
-      coverImage: `https://opengraph.githubassets.com/hash${Math.floor(Math.random() * 1000000)}/${username}/${repo.name}`
+      coverImage: `https://opengraph.githubassets.com/hash123/${username}/${repo.name}`
     }));
     const jsonString = await fs.promises.readFile('./assets/json/posts.json', 'utf8');
     const data1 = JSON.parse(jsonString);
