@@ -18,6 +18,7 @@
     <link rel="preload" href="../assets/images/red_button_hover.png" as="image">
     <link rel="preload" href="../assets/images/red_button_active.png" as="image">
     <link rel="preload" href="../assets/images/upload.png" as="image">
+    <link rel="preload" href="../assets/images/copy.png" as="image">
     
 
     <meta charset="UTF-8" />
@@ -66,6 +67,7 @@
       }
 
       #preview {
+        position: relative;
         height: 100%;
         width: 100%;
         display: flex;
@@ -74,6 +76,58 @@
         justify-content: center;
         flex-grow: 1;
         cursor: se-resize;
+      }
+
+      #sideBar, #light-controls {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      #light-controls {
+        top: unset;
+        bottom: 10px;
+      }
+
+      #zoomIn, #zoomOut {
+        border-image-source: url("../assets/images/normal_button.png");
+        border-image-slice: 2 2 4 2 fill;
+        border-width: 4px 4px 8px 4px;
+        border-style: solid;
+        padding: 2px 4px;
+        cursor: pointer;
+      }
+
+      #zoomIn:hover, #zoomOut:hover {
+        border-image-source: url("../assets/images/normal_button_hover.png");
+      }
+
+      #zoomIn:hover img, #zoomOut:hover img {
+        filter: invert(1);
+      }
+
+
+      #zoomIn:active, #zoomOut:active {
+        border-image-source: url("../assets/images/normal_button_active.png");
+        border-image-slice: 2 fill;
+        border-width: 4px;
+        margin-top: 4px;
+      }
+
+      #zoomIn img, #zoomOut img {
+        width: 30px;
+        image-rendering: pixelated;
+      }
+
+      #copyButton img, #custom-file-upload img {
+        width: 24px;
+      }
+
+      #custom-file-upload img{
+        width: 24px;
       }
 
       #controls {
@@ -104,14 +158,6 @@
 
       }
 
-      #copyButton {
-        color: white;
-        font-family: Minecraftia, sans-serif;
-        position: absolute;
-        top: 5px;
-        right: 5px;
-      }
-
       #jsonOutput pre {
         margin: 0;
         font-family: Minecraftia, sans-serif;
@@ -120,13 +166,6 @@
       canvas {
         margin-top: 10px;
         image-rendering: pixelated;
-      }
-
-      .zoom-controls {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 10px;
       }
 
       .resizable-canvas-container {
@@ -141,6 +180,7 @@
 
       #right-side,
       #left-side {
+        position: relative;
         flex: 1;
         box-sizing: border-box;
         overflow: auto;
@@ -151,11 +191,10 @@
         image-rendering: pixelated;
         background-repeat: repeat;
         background-size: 20px 20px;
-
         display: flex;
+
         justify-content: center;
         align-items: center;
-        position: relative;
       }
       #right-side {
         background-color: #48494a;
@@ -206,7 +245,7 @@
       }
 
       #lightModeButton:active {
-        padding-bottom: 2px;
+        margin-top: 4px;
         border-width: 4px 4px 4px 4px;
         border-image-source: url("../assets/images/white_button_active.png");
         border-image-slice: 2 2 2 2 fill;
@@ -216,12 +255,23 @@
         border-image-source: url("../assets/images/dark_button.png");
       }
 
+      #darkModeButton img, #lightModeButton img {
+        width: 18px;
+        height: 18px;
+      }
+      #darkModeButton img {
+        filter: invert(0.8);
+      }
+      #lightModeButton img {
+        filter: invert(0.2);
+      }
+
       #darkModeButton:hover {
         border-image-source: url("../assets/images/dark_button_hover.png");
       }
 
       #darkModeButton:active {
-        padding-bottom: 2px;
+        margin-top: 4px;
         border-width: 4px 4px 4px 4px;
         border-image-source: url("../assets/images/dark_button_active.png");
         border-image-slice: 2 2 2 2 fill;
@@ -269,7 +319,6 @@
 
       #custom-file-upload,
       #copyButton {
-        margin-top: 10px;
         display: flex;
         gap: 10px;
         justify-content: center;
@@ -285,10 +334,14 @@
 
       #custom-file-upload:active,
       #copyButton:active {
-        padding-bottom: 7px;
+        margin-top: 4px;
         border-width: 4px 4px 4px 4px;
         border-image-source: url("../assets/images/blue_button_active.png");
         border-image-slice: 2 2 2 2 fill;
+      }
+
+      #copyButton:active {
+        margin-top: 4px;
       }
 
       .increase {
@@ -310,13 +363,13 @@
       }
 
       .increase:active {
-        padding-bottom: 7px;
+        margin-top: 4px;
         border-image-source: url("../assets/images/blue_button_active.png");
         border-image-slice: 2 2 2 2 fill;
       }
 
       .decrease:active {
-        padding-bottom: 7px;
+        margin-top: 4px;
         border-image-source: url("../assets/images/red_button_active.png");
         border-image-slice: 2 2 2 2 fill;
       }
@@ -349,6 +402,19 @@
         overflow: hidden;
         text-overflow: clip;
       }
+
+      #zoomPercentage {
+        
+        color: white;
+        mix-blend-mode: difference;
+        font-size: large;
+      }
+      
+      #left-side-sidebar {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+      }
     </style>
     <script src="https://cdn.rawgit.com/exif-js/exif-js/master/exif.js"></script>
   </head>
@@ -364,7 +430,6 @@
 }
             </pre
           >
-          <button id="copyButton">Copy JSON</button>
         </div>
         <div id="controls">
           <div>
@@ -421,29 +486,21 @@
               ></button>
             </div>
           </div>
-          <div>
-            <div id="zoomValue" style="text-align: center">Zoom: 1x</div>
-            <input
-              type="range"
-              id="zoomSlider"
-              min="0.5"
-              max="5"
-              value="1"
-              step="0.1"
-            />
-          </div>
-          <div>
-            <div>Upload:</div>
-            <label for="textureUpload" id="custom-file-upload"><img src="../assets/images/upload.png" alt=/></label>
-            <input type="file" id="textureUpload" accept="image/*" />
-          </div>
-          <button id="darkModeButton" class="mode-button">Darker</button>
-          <button id="lightModeButton" class="mode-button">Lighter</button>
         </div>
       </div>
       <div id="left-side">
         <div id="editor">
           <div id="preview">
+            <div id="sideBar">
+              <button id="copyButton"><img src="../assets/images/copy.png"></button>
+              <label for="textureUpload" id="custom-file-upload"><img src="../assets/images/upload.png" alt=/></label>
+              <input type="file" id="textureUpload" accept="image/*" />
+              <button id="darkModeButton" class="mode-button"><img src="../assets/images/dark.png" alt="🌙"></button>
+              <button id="lightModeButton" class="mode-button"><img src="../assets/images/light.png" alt="🔆"></button>
+              <button id="zoomIn"><img src="../assets/images/zoom_in.png" alt="+"></button>
+              <button id="zoomOut"><img src="../assets/images/zoom_out.png" alt="-"></button>
+              <div id="zoomPercentage">100%</div>
+            </div>
             <div class="resizable-canvas-container">
               <canvas id="scaledCanvas"></canvas>
             </div>
@@ -487,10 +544,28 @@
       const scaledCanvas = document.getElementById("scaledCanvas");
       const jsonConfig = document.getElementById("jsonConfig");
       const zoomSlider = document.getElementById("zoomSlider");
-      const zoomValue = document.getElementById("zoomValue");
       const copyButton = document.getElementById("copyButton");
       const darkModeButton = document.getElementById("darkModeButton");
       const lightModeButton = document.getElementById("lightModeButton");
+
+      const zoomIn = document.getElementById("zoomIn");
+      const zoomOut = document.getElementById("zoomOut");
+      const zoomPercentage = document.getElementById("zoomPercentage");
+
+      zoomIn.addEventListener("click", () => {
+        const value = Number(scaledCanvas.style.transform == "" ? "1" : scaledCanvas.style.transform.match(/scale\((.*?)\)/)[1]);        
+        scaledCanvas.style.transform = `scale(${value + 0.1})`;
+
+        zoomPercentage.textContent = `${Math.round(Number(scaledCanvas.style.transform == "" ? "1" : scaledCanvas.style.transform.match(/scale\((.*?)\)/)[1]) * 100)}%`;
+      })
+
+      zoomOut.addEventListener("click", () => {
+        const value = Number(scaledCanvas.style.transform == "" ? "1" : scaledCanvas.style.transform.match(/scale\((.*?)\)/)[1]);
+        if (value <= 0.2) return;
+        scaledCanvas.style.transform = `scale(${value - 0.1})`;
+
+        zoomPercentage.textContent = `${Math.round(Number(scaledCanvas.style.transform == "" ? "1" : scaledCanvas.style.transform.match(/scale\((.*?)\)/)[1]) * 100)}%`;
+      })
 
       const editor = document.getElementById("editor");
 
@@ -505,11 +580,6 @@
       sliceBottom.addEventListener("input", update);
       scaledWidth.addEventListener("input", update);
       scaledHeight.addEventListener("input", update);
-      zoomSlider.addEventListener("input", () => {
-        zoomValue.textContent = `Zoom: ${zoomSlider.value}x`;
-        scaledCanvas.style.transform = `scale(${zoomSlider.value})`;
-      });
-
       copyButton.addEventListener("click", () => {
         const jsonText = jsonConfig.textContent;
 
@@ -587,6 +657,7 @@
       }
 
       function update() {
+        drawSliceLines();
         const nineslice = {
           left: parseInt(sliceLeft.value),
           top: parseInt(sliceTop.value),
@@ -742,6 +813,43 @@
   preview.addEventListener("mousedown", startDrag);
   preview.addEventListener("touchstart", startDrag);
 });
+
+function drawSliceLines() {
+  // Clear the canvas
+  scaledContext.clearRect(0, 0, scaledCanvas.width, scaledCanvas.height);
+
+  // Draw the uploaded image onto the canvas
+  scaledContext.drawImage(image, 0, 0, scaledCanvas.width, scaledCanvas.height);
+
+  // Get slice values
+  const left = parseInt(sliceLeft.value);
+  const top = parseInt(sliceTop.value);
+  const right = parseInt(sliceRight.value);
+  const bottom = parseInt(sliceBottom.value);
+
+  // Calculate the actual positions in the scaled image
+  const leftPos = (left / image.width) * scaledCanvas.width;
+  const topPos = (top / image.height) * scaledCanvas.height;
+  const rightPos = scaledCanvas.width - (right / image.width) * scaledCanvas.width;
+  const bottomPos = scaledCanvas.height - (bottom / image.height) * scaledCanvas.height;
+
+  // Set the line style
+  scaledContext.strokeStyle = 'red';
+  scaledContext.lineWidth = 2;
+
+  // Draw the slice lines
+  scaledContext.beginPath();
+  scaledContext.moveTo(leftPos, 0);
+  scaledContext.lineTo(leftPos, scaledCanvas.height);
+  scaledContext.moveTo(rightPos, 0);
+  scaledContext.lineTo(rightPos, scaledCanvas.height);
+  scaledContext.moveTo(0, topPos);
+  scaledContext.lineTo(scaledCanvas.width, topPos);
+  scaledContext.moveTo(0, bottomPos);
+  scaledContext.lineTo(scaledCanvas.width, bottomPos);
+  scaledContext.stroke();
+}
+
     </script>
   </body>
 </html>
