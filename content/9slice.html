@@ -681,19 +681,15 @@
       }
 
       function updateJsonOutput(nineslice) {
-        jsonConfig.textContent = customStringify(
-          {
-            nineslice_size: [
-              nineslice.left,
-              nineslice.top,
-              nineslice.right,
-              nineslice.bottom,
-            ],
-            base_size: [image.width, image.height],
-          },
-          null,
-          1
-        );
+          const isUniform = nineslice.top === nineslice.left && nineslice.right === nineslice.left && nineslice.bottom === nineslice.left;
+          jsonConfig.textContent = customStringify(
+            {
+              nineslice_size:isUniform ? nineslice.left : [nineslice.left,nineslice.top,nineslice.right,nineslice.bottom],
+              base_size: [image.width, image.height],
+            },
+            null,
+            1
+          );
       }
 
       function customStringify(obj) {
