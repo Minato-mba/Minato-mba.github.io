@@ -3,7 +3,6 @@
   <head>
 
     <link rel="preload" href="../assets/images/container.png" as="image">
-    <link rel="preload" href="../assets/images/container.png" as="image">
     <link rel="preload" href="../assets/images/cell_image.png" as="image">
     <link rel="preload" href="../assets/images/cell_image_selected.png" as="image">
     <link rel="preload" href="../assets/images/magnifying_glass.png" as="image">
@@ -53,7 +52,7 @@
         padding: 20px;
       }
 
-      /* Keyframes for Background Animation */
+      
       @keyframes moveBackground {
         0% {
           background-position: 0 0;
@@ -104,7 +103,7 @@
         border-width: 48px 4px 8px 44px;
         border-style: solid;
         image-rendering: pixelated;
-        pointer-events: none; /* Allows clicks to go through to the input */
+        pointer-events: none; 
         z-index: 0;
       }
 
@@ -191,7 +190,7 @@
       .image-container {
         position: relative;
         width: 100%;
-        padding-bottom: 100%; /* This keeps the div square */
+        padding-bottom: 100%; 
         border-image-source: url("../assets/images/cell_image.png");
         border-image-slice: 2 2 4 2 fill;
         border-width: 4px 4px 8px 4px;
@@ -268,6 +267,12 @@
         width: 50%;
       }
 
+      @media (prefers-reduced-motion: reduce) {
+        body {
+          animation: none;
+        }
+      }
+
       @media (max-width: 768px) {
         #search-bar, #output-name {
           font-size: 0.9rem;
@@ -276,6 +281,10 @@
         button {
           padding: 8px 16px;
           font-size: 0.9rem;
+        }
+
+        #image-grid {
+          grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
         }
       }
 
@@ -292,6 +301,10 @@
         }
         #loading-logo{
           width: 70%;
+        }
+
+        #image-grid {
+          grid-template-columns: repeat(auto-fill, minmax(35px, 1fr));
         }
       }
     </style>
@@ -321,79 +334,141 @@
       const imageURIs = {};
       const grid = document.getElementById("image-grid");
       const selectedImages = new Set();
+      let progress = 0;
+      let isLowEndDevice = false;
 
-      // Fetch images from the GitHub API and convert them to base64 URIs
-      let progress = 0
+      function detectDevicePerformance() {
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const lowConcurrency = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
+        isLowEndDevice = isMobile || lowConcurrency;
+        if (isLowEndDevice) {
+          document.body.style.animation = 'none';
+        }
+      }
 
       async function loadImages() {
+        detectDevicePerformance();
         document.getElementById("output-name").value = "glyph_E9.png";
-        const response = await fetch(
-          "https://api.github.com/repos/Mojang/bedrock-samples/contents/resource_pack/textures/items"
-        );
-        const data = await response.json();
 
-        let fileIndex = 0
-        let processedFiles = 0
-        
-        data.forEach(async (file) => {
-          if (file.name.endsWith(".png")) {
-            const imageUrl = file.download_url
+        try {
+          const response = await fetch(
+            "https://api.github.com/repos/Mojang/bedrock-samples/contents/resource_pack/textures/items"
+          );
+          const data = await response.json();
 
-            const imageBlob = await fetch(imageUrl).then((res) => res.blob());
+          let fileIndex = 0;
+          let processedFiles = 0;
+          let imagesToProcess = data.filter(file => file.name.endsWith(".png"));
+          let imagesToRender = [];
 
-            // Convert the blob to a base64 data URI
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              const img = new Image();
-              img.src = reader.result; // Use base64 data URI
+          const batchSize = isLowEndDevice ? 5 : 15;
 
-              img.onload = () => {
-                processedFiles++
-                if (img.width === 16 && img.height === 16) {
-                  // Store the image if it's 16x16
-                  imageURIs[file.name] = reader.result;
-                  displayImage(file.name);
-                } else {
-                  console.warn(`Image ${file.name} is not 16x16, skipping.`);
+          async function processBatch(startIndex) {
+            const endIndex = Math.min(startIndex + batchSize, imagesToProcess.length);
+            const batch = imagesToProcess.slice(startIndex, endIndex);
+
+            for (const file of batch) {
+              try {
+                const imageUrl = file.download_url;
+                const imageBlob = await fetch(imageUrl).then(res => res.blob());
+
+                const imageData = await new Promise((resolve) => {
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    const img = new Image();
+                    img.onload = () => {
+                      if (img.width === 16 && img.height === 16) {
+                        resolve({
+                          name: file.name,
+                          data: reader.result,
+                          valid: true
+                        });
+                      } else {
+                        console.warn(`Image ${file.name} is not 16x16, skipping.`);
+                        resolve({ valid: false });
+                      }
+                    };
+                    img.src = reader.result;
+                  };
+                  reader.readAsDataURL(imageBlob);
+                });
+
+                if (imageData.valid) {
+                  imageURIs[imageData.name] = imageData.data;
+                  imagesToRender.push(imageData.name);
                 }
-              };
-            };
-            reader.readAsDataURL(imageBlob);
+              } catch (err) {
+                console.error(`Error processing image ${file.name}:`, err);
+              }
+
+              processedFiles++;
+              updateLoadingProgress(processedFiles, imagesToProcess.length);
+            }
+
+            renderImages(imagesToRender);
+            imagesToRender = [];
+
+            if (endIndex < imagesToProcess.length) {
+              setTimeout(() => processBatch(endIndex), 50);
+            } else {
+              finishLoading();
+            }
           }
-          fileIndex++
-          progress = (processedFiles*100)/data.length
-          const bar = document.getElementById("progress-bar")
-          bar.style.width = `${progress}%`
-          const percentage = document.getElementById("percentage")
-          percentage.innerText = `${Math.floor(progress)} %`
-          if(progress == 100 || (fileIndex*100)/data.length == 100){
-            setTimeout(() => {
-              setTimeout(() => {
-                bar.style.width = `100%`
-                percentage.innerText = `100 %`
-              }, 1000)
-              const loading = document.getElementById("loading")
-              loading.style.display = "none"
-            }, 2000);
-          }
+
+          processBatch(0);
+        } catch (error) {
+          console.error("Error fetching images:", error);
+          document.getElementById("percentage").innerText = "Error loading images. Please refresh.";
+        }
+      }
+
+      function updateLoadingProgress(processed, total) {
+        progress = (processed * 100) / total;
+        const bar = document.getElementById("progress-bar");
+        bar.style.width = `${progress}%`;
+        const percentage = document.getElementById("percentage");
+        percentage.innerText = `${Math.floor(progress)} %`;
+      }
+
+      function finishLoading() {
+        setTimeout(() => {
+          const bar = document.getElementById("progress-bar");
+          bar.style.width = `100%`;
+          document.getElementById("percentage").innerText = `100 %`;
+
+          setTimeout(() => {
+            const loading = document.getElementById("loading");
+            loading.style.display = "none";
+          }, 1000);
+        }, 500);
+      }
+
+      function renderImages(imageNames) {
+        const fragment = document.createDocumentFragment();
+
+        imageNames.forEach(image => {
+          const container = document.createElement("div");
+          container.classList.add("image-container");
+          container.dataset.image = image;
+          container.onclick = () => toggleSelect(container, image);
+
+          const img = document.createElement("img");
+          img.src = imageURIs[image];
+          img.alt = image;
+          img.classList.add("image-item");
+          img.loading = "lazy";
+          img.title = image.replace(".png", "").replaceAll("_", " ");
+
+          container.appendChild(img);
+          fragment.appendChild(container);
         });
+
+        grid.appendChild(fragment);
       }
 
       function displayImage(image) {
-        const container = document.createElement("div");
-        container.classList.add("image-container");
-        container.onclick = () => toggleSelect(container, image);
-
-        const img = document.createElement("img");
-        img.src = imageURIs[image];
-        img.alt = image;
-        img.classList.add("image-item");
-        img.title = image.replace(".png", "").replaceAll("_", " ");
-
-        container.appendChild(img);
-        grid.appendChild(container);
+        renderImages([image]);
       }
-
 
       function toggleSelect(container, image) {
         if (selectedImages.has(image)) {
@@ -405,21 +480,34 @@
         }
       }
 
-      function filterImages() {
+      function debounce(func, wait) {
+        let timeout;
+        return function() {
+          const context = this;
+          const args = arguments;
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+      }
+
+      const filterImagesDebounced = debounce(function() {
         const searchValue = document
           .getElementById("search-bar")
           .value.toLowerCase();
-        const imageContainers =
-          document.getElementsByClassName("image-container");
+        const imageContainers = document.getElementsByClassName("image-container");
 
         Array.from(imageContainers).forEach((container) => {
-          const img = container.getElementsByTagName("img")[0];
-          if (img.alt.toLowerCase().includes(searchValue)) {
+          const imageName = container.dataset.image;
+          if (imageName.toLowerCase().includes(searchValue)) {
             container.style.display = "block";
           } else {
             container.style.display = "none";
           }
         });
+      }, 200);
+
+      function filterImages() {
+        filterImagesDebounced();
       }
 
       async function generateImage() {
@@ -430,53 +518,49 @@
 
         const canvas = document.getElementById("output-canvas");
         const ctx = canvas.getContext("2d");
-        const outputName =
-          document.getElementById("output-name").value || "glyph_E9";
+        let outputName = document.getElementById("output-name").value || "glyph_E9";
+
+        if (!outputName.endsWith('.png')) {
+          outputName += '.png';
+        }
+
         const imagesArray = Array.from(selectedImages);
         const totalSlots = 16 * 16;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const drawImage = (imgSrc, x, y) => {
-          return new Promise((resolve) => {
-            const img = new Image();
-            img.src = imgSrc;
-            img.onload = () => {
-              ctx.drawImage(img, x, y, 16, 16);
-              resolve();
-            };
-          });
-        };
 
-        // Draw selected images
-        for (let i = 0; i < imagesArray.length; i++) {
-          const image = imagesArray[i];
-          const x = (i % 16) * 16;
-          const y = Math.floor(i / 16) * 16; 
-
-          await drawImage(imageURIs[image], x, y);
+        for (let y = 0; y < 16; y++) {
+          for (let x = 0; x < 16; x++) {
+            if ((y + x) % 2 === 0) {
+              ctx.fillStyle = "#CCCCCC";
+            } else {
+              ctx.fillStyle = "#FFFFFF";
+            }
+            ctx.fillRect(x * 16, y * 16, 16, 16);
+          }
         }
 
-        // Fill remaining slots with a checkerboard pattern
-        for (let i = imagesArray.length; i < totalSlots; i++) {
+        const loadedImages = await Promise.all(
+          imagesArray.map(async (image) => {
+            return new Promise((resolve) => {
+              const img = new Image();
+              img.onload = () => resolve({ img, name: image });
+              img.src = imageURIs[image];
+            });
+          })
+        );
+
+        loadedImages.forEach((item, i) => {
           const x = (i % 16) * 16;
           const y = Math.floor(i / 16) * 16;
+          ctx.drawImage(item.img, x, y, 16, 16);
+        });
 
-          if ((Math.floor(i / 16) + (i % 16)) % 2 === 0) {
-            ctx.fillStyle = "#CCCCCC";
-          } else {
-            ctx.fillStyle = "#FFFFFF";
-          }
-
-          ctx.fillRect(x, y, 16, 16);
-        }
-
-        // Save the generated image
         const link = document.createElement("a");
-        link.download = `${outputName}.png`;
-        link.href = canvas.toDataURL();
+        link.download = outputName;
+        link.href = canvas.toDataURL("image/png");
         link.click();
       }
 
-      // Load the images when the page is loaded
       window.onload = loadImages;
     </script>
   </body>
