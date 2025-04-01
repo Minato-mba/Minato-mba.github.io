@@ -185,6 +185,7 @@
         grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
         column-gap: 7px;
         overflow: hidden;
+        -webkit-overflow-scrolling: touch;
       }
 
       .image-container {
@@ -196,6 +197,7 @@
         border-width: 4px 4px 8px 4px;
         border-style: solid;
         cursor: pointer;
+        touch-action: pan-y;
       }
 
       .image-container.selected {
@@ -336,6 +338,10 @@
       const selectedImages = new Set();
       let progress = 0;
       let isLowEndDevice = false;
+      
+      let lastTouchTime = 0;
+      let lastScrollTime = 0;
+      const TOUCH_SCROLL_THRESHOLD = 300;
 
       function detectDevicePerformance() {
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -450,7 +456,22 @@
           const container = document.createElement("div");
           container.classList.add("image-container");
           container.dataset.image = image;
-          container.onclick = () => toggleSelect(container, image);
+          
+          container.addEventListener('touchstart', function(e) {
+            lastTouchTime = Date.now();
+          }, { passive: true });
+          
+          container.addEventListener('touchend', function(e) {
+            if (Date.now() - lastScrollTime > TOUCH_SCROLL_THRESHOLD) {
+              toggleSelect(container, image);
+            }
+          }, { passive: true });
+          
+          container.addEventListener('click', function(e) {
+            if (!('ontouchstart' in window) || Date.now() - lastScrollTime > TOUCH_SCROLL_THRESHOLD) {
+              toggleSelect(container, image);
+            }
+          });
 
           const img = document.createElement("img");
           img.src = imageURIs[image];
@@ -458,6 +479,7 @@
           img.classList.add("image-item");
           img.loading = "lazy";
           img.title = image.replace(".png", "").replaceAll("_", " ");
+          img.draggable = false;
 
           container.appendChild(img);
           fragment.appendChild(container);
@@ -479,6 +501,14 @@
           container.classList.add("selected");
         }
       }
+
+      window.addEventListener('scroll', function() {
+        lastScrollTime = Date.now();
+      }, { passive: true });
+
+      document.addEventListener('touchmove', function() {
+        lastScrollTime = Date.now();
+      }, { passive: true });
 
       function debounce(func, wait) {
         let timeout;
