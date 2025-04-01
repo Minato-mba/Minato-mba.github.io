@@ -308,7 +308,7 @@
       <div id="top_bar">
         <div class="search-container"><input type="text" id="search-bar" placeholder="" onkeyup="filterImages()"/></div>
         <div class = "bar-item">
-          <input class = "bar-item" type="text" id="output-name" value="glyph_E9.png" placeholder="Output image name" />
+          <input class = "bar-item" type="text" id="output-name" value="glyph_E9" placeholder="Output image name" />
           <button class = "bar-item" onclick="generateImage()">✓</button>
         </div>
       </div>
@@ -431,7 +431,7 @@
         const canvas = document.getElementById("output-canvas");
         const ctx = canvas.getContext("2d");
         const outputName =
-          document.getElementById("output-name").value || "glyph_E9.png";
+          document.getElementById("output-name").value || "glyph_E9";
         const imagesArray = Array.from(selectedImages);
         const totalSlots = 16 * 16;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
