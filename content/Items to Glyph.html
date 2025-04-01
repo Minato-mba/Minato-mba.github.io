@@ -550,8 +550,8 @@
         const ctx = canvas.getContext("2d");
         let outputName = document.getElementById("output-name").value || "glyph_E9";
 
-        if (!outputName.endsWith('.png')) {
-          outputName += '.png';
+        if (outputName.endsWith('.png')) {
+          outputName.replace(/\.png$/, '');
         }
 
         const imagesArray = Array.from(selectedImages);
