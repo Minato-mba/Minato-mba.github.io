@@ -2,9 +2,14 @@
   "title": "Arabic Language Fix",
   "buttons": [
     {
-      "text": "1.21.7x - 1.21.8x Latest",
-      "link": "https://www.mediafire.com/file/h0cs8ms14gke3bl/1.21.70%252B_Ar_Lang_Fix.mcaddon/file",
+      "text": "1.21.9x Latest",
+      "link": "https://www.mediafire.com/file/ozav0qqt3qon211/1.21.9x_Ar_Lang_Fix.mcaddon/file",
       "color": "green-button"
+    },
+    {
+      "text": "1.21.7x - 1.21.8x",
+      "link": "https://www.mediafire.com/file/h0cs8ms14gke3bl/1.21.70%252B_Ar_Lang_Fix.mcaddon/file",
+      "color": "gray-button"
     },
     {
       "text": "1.21.6x Latest",
