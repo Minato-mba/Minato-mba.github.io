@@ -94,7 +94,9 @@ function getHtml(coverImage, item, data) {
                 <title>${item.title}</title>
                 <link rel="stylesheet" href="../../assets/css/styles.css" />
                 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1144521904849121"crossorigin="anonymous"></script>
-              </head>
+              <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6790880772028234"
+     crossorigin="anonymous"></script>
+  </head>
               <body>
                 <audio id="clickSound" src="../../assets/sounds/click.mp3" preload="auto"></audio>
                 <div class="overlay">
